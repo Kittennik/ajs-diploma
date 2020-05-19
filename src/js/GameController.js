@@ -35,7 +35,7 @@ export default class GameController {
     this.gamePlay.addNewGameListener(this.newGame.bind(this));
     this.gamePlay.addLoadGameListener(this.loadGame.bind(this));
     this.gamePlay.addSaveGameListener(this.saveGame.bind(this));
-    this.gamePlay.drawUi(themes.prairie);
+    this.gamePlay.drawUi(this.currentTheme);
     this.startingTeams();
     this.gamePlay.redrawPositions(this.userTeam.concat(this.enemyTeam));
   }
@@ -57,6 +57,7 @@ export default class GameController {
     this.level = 1;
     this.points = 0;
     this.boardLocked = false;
+    this.currentTheme = themes.prairie;
     this.init();
   }
 
@@ -82,30 +83,13 @@ export default class GameController {
         this.selectedCell = loadGameState.selected;
         this.level = loadGameState.level;
         this.points = loadGameState.points;
-        this.gamePlay.drawUi(this.currentTheme);
+        this.currentTheme = loadGameState.currentTheme;
         this.gamePlay.redrawPositions(this.userTeam.concat(this.enemyTeam));
         this.turn = 'user';
       }
     } catch (e) {
       GamePlay.showMessage('Не удалось загрузить игру');
       this.newGame();
-    }
-  }
-
-  chooseCurrentTheme() {
-    if (this.level === 1) {
-      this.currentTheme === themes.prairie;
-    }
-    if (this.level === 2) {
-      this.currentTheme === themes.desert;
-    }
-    if (this.level === 3) {
-      this.currentTheme === themes.arctic;
-    }
-    if (this.level === 4) {
-      this.currentTheme === themes.mountain;
-    } else {
-      throw new Error('Ошибка загрузки карты');
     }
   }
 
@@ -335,8 +319,8 @@ export default class GameController {
 
   checkLevelUp() {
     if (this.enemyTeam.length > 0) return false;
-    const levelUp = (landscape, addUserCharactersCount, addUserCharactersLevel, maxEnemyLevel) => {
-      this.gamePlay.drawUi(landscape);
+    const levelUp = (currentTheme, addUserCharactersCount, addUserCharactersLevel, maxEnemyLevel) => {
+      this.gamePlay.drawUi(currentTheme);
       this.userTeam.forEach((element) => {
         this.points += element.character.health;
         element.character.attack = Math.floor(Math.max(element.character.attack, element.character.attack * (1.8 - element.character.health / 100)));
@@ -366,13 +350,16 @@ export default class GameController {
       this.level += 1;
     };
     if (this.level === 1) {
-      levelUp('desert', 1, 1, 2);
+      this.currentTheme = themes.desert;
+      levelUp(this.currentTheme, 1, 1, 2);
     }
     if (this.level === 2) {
-      levelUp('arctic', 2, 2, 3);
+      this.currentTheme = themes.arctic;
+      levelUp(this.currentTheme, 2, 2, 3);
     }
     if (this.level === 3) {
-      levelUp('mountain', 2, 3, 4);
+      this.currentTheme = themes.mountain;
+      levelUp(this.currentTheme, 2, 3, 4);
     }
     if (this.level === 4) {
       this.endGame('Вы выиграли!');

@@ -7,7 +7,7 @@
     "test": "jest --coverage",
     "lint": "eslint .",
     "build": "webpack --mode production",
-    "fix": "eslint --fix ./src/"
+    "fix": "eslint --fix ../ajs-diploma/"
   },
   "repository": {
     "type": "git",
